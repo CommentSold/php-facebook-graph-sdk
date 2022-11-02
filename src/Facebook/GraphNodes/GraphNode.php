@@ -101,9 +101,9 @@ class GraphNode extends Collection
      *
      * @return string
      */
-    public function asJson($options = 0)
+    public function asJson($options = 0): string
     {
-        return json_encode($this->uncastItems(), $options);
+        return json_encode($this->uncastItems(), $options) ?: '';
     }
 
     /**

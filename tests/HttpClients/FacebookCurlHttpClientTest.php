@@ -23,6 +23,7 @@
  */
 namespace Facebook\Tests\HttpClients;
 
+use Facebook\Exceptions\FacebookSDKException;
 use Mockery as m;
 use Facebook\HttpClients\FacebookCurlHttpClient;
 
@@ -41,7 +42,7 @@ class FacebookCurlHttpClientTest extends AbstractTestHttpClient
     const CURL_VERSION_STABLE = 0x072400;
     const CURL_VERSION_BUGGY = 0x071400;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!extension_loaded('curl')) {
             $this->markTestSkipped('cURL must be installed to test cURL client handler.');
@@ -252,11 +253,9 @@ class FacebookCurlHttpClientTest extends AbstractTestHttpClient
         $this->assertEquals(200, $response->getHttpResponseCode());
     }
 
-    /**
-     * @expectedException \Facebook\Exceptions\FacebookSDKException
-     */
     public function testThrowsExceptionOnClientError()
     {
+        $this->expectException(FacebookSDKException::class);
         $this->curlMock
             ->shouldReceive('init')
             ->once()
