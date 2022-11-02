@@ -1,5 +1,6 @@
 {
-    "name": "facebook/graph-sdk",
+    "name": "commentsold/facebook-graph-sdk",
+    "version": "6.0.0",
     "description": "Facebook SDK for PHP",
     "keywords": ["facebook", "sdk"],
     "type": "library",
