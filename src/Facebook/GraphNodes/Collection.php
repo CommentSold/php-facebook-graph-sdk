@@ -35,6 +35,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use ReturnTypeWillChange;
 
 class Collection implements ArrayAccess, Countable, IteratorAggregate
 {
@@ -63,7 +64,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return mixed
      */
-    public function getField($name, $default = null)
+    public function getField($name, $default = null): mixed
     {
         if (isset($this->items[$name])) {
             return $this->items[$name];
@@ -83,7 +84,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      * @deprecated 5.0.0 getProperty() has been renamed to getField()
      * @todo v6: Remove this method
      */
-    public function getProperty($name, $default = null)
+    public function getProperty($name, $default = null): mixed
     {
         return $this->getField($name, $default);
     }
@@ -93,7 +94,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return array
      */
-    public function getFieldNames()
+    public function getFieldNames(): array
     {
         return array_keys($this->items);
     }
@@ -106,7 +107,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      * @deprecated 5.0.0 getPropertyNames() has been renamed to getFieldNames()
      * @todo v6: Remove this method
      */
-    public function getPropertyNames()
+    public function getPropertyNames(): array
     {
         return $this->getFieldNames();
     }
@@ -116,7 +117,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return array
      */
-    public function all()
+    public function all(): array
     {
         return $this->items;
     }
@@ -126,7 +127,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return array
      */
-    public function asArray()
+    public function asArray(): array
     {
         return array_map(function ($value) {
             return $value instanceof Collection ? $value->asArray() : $value;
@@ -152,7 +153,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return string
      */
-    public function asJson($options = 0)
+    public function asJson($options = 0): string
     {
         return json_encode($this->asArray(), $options);
     }
@@ -162,7 +163,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return int
      */
-    public function count()
+    #[ReturnTypeWillChange] public function count()
     {
         return count($this->items);
     }
@@ -172,7 +173,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return ArrayIterator
      */
-    public function getIterator()
+    #[ReturnTypeWillChange] public function getIterator()
     {
         return new ArrayIterator($this->items);
     }
@@ -184,7 +185,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return bool
      */
-    public function offsetExists($key)
+    #[ReturnTypeWillChange] public function offsetExists($key)
     {
         return array_key_exists($key, $this->items);
     }
@@ -196,7 +197,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return mixed
      */
-    public function offsetGet($key)
+    #[ReturnTypeWillChange] public function offsetGet($key)
     {
         return $this->items[$key];
     }
@@ -209,7 +210,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return void
      */
-    public function offsetSet($key, $value)
+    #[ReturnTypeWillChange] public function offsetSet($key, $value)
     {
         if (is_null($key)) {
             $this->items[] = $value;
@@ -225,7 +226,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      *
      * @return void
      */
-    public function offsetUnset($key)
+    #[ReturnTypeWillChange] public function offsetUnset($key)
     {
         unset($this->items[$key]);
     }

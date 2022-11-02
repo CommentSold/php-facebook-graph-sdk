@@ -23,10 +23,11 @@
  */
 namespace Facebook\Tests;
 
+use Facebook\Exceptions\FacebookSDKException;
 use Facebook\FacebookApp;
 use Facebook\SignedRequest;
 
-class SignedRequestTest extends \PHPUnit_Framework_TestCase
+class SignedRequestTest extends BaseTestCase
 {
     /**
      * @var FacebookApp
@@ -46,7 +47,7 @@ class SignedRequestTest extends \PHPUnit_Framework_TestCase
         'foo' => 'bar',
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->app = new FacebookApp('123', 'foo_app_secret');
     }
@@ -64,11 +65,9 @@ class SignedRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->payloadData, $payload);
     }
 
-    /**
-     * @expectedException \Facebook\Exceptions\FacebookSDKException
-     */
     public function testInvalidSignedRequestsWillFailFormattingValidation()
     {
+        $this->expectException(FacebookSDKException::class);
         new SignedRequest($this->app, 'invalid_signed_request');
     }
 
@@ -88,27 +87,21 @@ class SignedRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('aijkoprstADIJKLOPQTUVX1256!)]-:;"<>?.|~', $decodedData);
     }
 
-    /**
-     * @expectedException \Facebook\Exceptions\FacebookSDKException
-     */
     public function testAnImproperlyEncodedSignatureWillThrowAnException()
     {
+        $this->expectException(FacebookSDKException::class);
         new SignedRequest($this->app, 'foo_sig.' . $this->rawPayload);
     }
 
-    /**
-     * @expectedException \Facebook\Exceptions\FacebookSDKException
-     */
     public function testAnImproperlyEncodedPayloadWillThrowAnException()
     {
+        $this->expectException(FacebookSDKException::class);
         new SignedRequest($this->app, $this->rawSignature . '.foo_payload');
     }
 
-    /**
-     * @expectedException \Facebook\Exceptions\FacebookSDKException
-     */
     public function testNonApprovedAlgorithmsWillThrowAnException()
     {
+        $this->expectException(FacebookSDKException::class);
         $signedRequestData = $this->payloadData;
         $signedRequestData['algorithm'] = 'FOO-ALGORITHM';
 
