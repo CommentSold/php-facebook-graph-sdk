@@ -161,4 +161,27 @@ class FacebookBatchResponseTest extends BaseTestCase
           'ETag' => '"barTag"',
         ], $batchResponse[1]->getHeaders());
     }
+
+    public function testExtraResponsesAreIgnored()
+    {
+        $graphResponseJson = '[';
+        $graphResponseJson .= '{"code":200,"headers":[],"body":"{}"},'; // Response key 0
+        $graphResponseJson .= '{"code":200,"headers":[],"body":"{}"},'; // Extra response key 1
+        $graphResponseJson .= '{"code":200,"headers":[],"body":"{}"}'; // Extra response key 2
+        $graphResponseJson .= ']';
+        $response = new FacebookResponse($this->request, $graphResponseJson, 200);
+
+        $requests = [
+            new FacebookRequest($this->app, 'foo_token_one', 'GET', '/me'),
+        ];
+
+        $batchRequest = new FacebookBatchRequest($this->app, $requests);
+        $batchResponse = new FacebookBatchResponse($batchRequest, $response);
+
+        $response = $batchResponse->getResponses();
+
+        self::assertTrue(isset($response[0]));
+        self::assertFalse(isset($response[1]));
+        self::assertFalse(isset($response[2]));
+    }
 }
