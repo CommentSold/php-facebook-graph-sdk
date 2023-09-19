@@ -106,6 +106,10 @@ class FacebookBatchResponse extends FacebookResponse implements IteratorAggregat
         // @TODO With PHP 5.5 support, this becomes array_column($response['headers'], 'value', 'name')
         $httpResponseHeaders = isset($response['headers']) ? $this->normalizeBatchHeaders($response['headers']) : [];
 
+        if (! $originalRequest) {
+            return;
+        }
+
         $this->responses[$originalRequestName] = new FacebookResponse(
             $originalRequest,
             $httpResponseBody,
