@@ -85,6 +85,12 @@ class FacebookClient
      */
     public static $requestCount = 0;
 
+    protected int $default_request_timeout;
+
+    protected int $file_upload_request_timeout;
+
+    protected int $video_upload_request_timeout;
+
     /**
      * Instantiates a new FacebookClient object.
      *
@@ -95,6 +101,9 @@ class FacebookClient
     {
         $this->httpClientHandler = $httpClientHandler ?: $this->detectHttpClientHandler();
         $this->enableBetaMode = $enableBeta;
+        $this->default_request_timeout = self::DEFAULT_REQUEST_TIMEOUT;
+        $this->file_upload_request_timeout = self::DEFAULT_FILE_UPLOAD_REQUEST_TIMEOUT;
+        $this->video_upload_request_timeout = self::DEFAULT_VIDEO_UPLOAD_REQUEST_TIMEOUT;
     }
 
     /**
@@ -186,6 +195,21 @@ class FacebookClient
         ];
     }
 
+    public function setDefaultRequestTimeout(int $timeout): void
+    {
+        $this->default_request_timeout = $timeout;
+    }
+
+    public function setFileUploadRequestTimeout(int $timeout): void
+    {
+        $this->file_upload_request_timeout = $timeout;
+    }
+
+    public function setVideoUploadRequestTimeout(int $timeout): void
+    {
+        $this->video_upload_request_timeout = $timeout;
+    }
+
     /**
      * Makes the request to Graph and returns the result.
      *
@@ -204,11 +228,11 @@ class FacebookClient
         list($url, $method, $headers, $body) = $this->prepareRequestMessage($request);
 
         // Since file uploads can take a while, we need to give more time for uploads
-        $timeOut = static::DEFAULT_REQUEST_TIMEOUT;
+        $timeOut = $this->default_request_timeout;
         if ($request->containsFileUploads()) {
-            $timeOut = static::DEFAULT_FILE_UPLOAD_REQUEST_TIMEOUT;
+            $timeOut = $this->file_upload_request_timeout;
         } elseif ($request->containsVideoUploads()) {
-            $timeOut = static::DEFAULT_VIDEO_UPLOAD_REQUEST_TIMEOUT;
+            $timeOut = $this->video_upload_request_timeout;
         }
 
         // Should throw `FacebookSDKException` exception on HTTP client error.

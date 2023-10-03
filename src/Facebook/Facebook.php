@@ -133,6 +133,9 @@ class Facebook
             'persistent_data_handler' => null,
             'pseudo_random_string_generator' => null,
             'url_detection_handler' => null,
+            'http_request_timeout' => FacebookClient::DEFAULT_REQUEST_TIMEOUT,
+            'http_file_upload_timeout' => FacebookClient::DEFAULT_FILE_UPLOAD_REQUEST_TIMEOUT,
+            'http_video_upload_timeout' => FacebookClient::DEFAULT_VIDEO_UPLOAD_REQUEST_TIMEOUT,
         ], $config);
 
         if (!$config['app_id']) {
@@ -147,6 +150,10 @@ class Facebook
             HttpClientsFactory::createHttpClient($config['http_client_handler']),
             $config['enable_beta_mode']
         );
+        $this->client->setDefaultRequestTimeout((int) $config['http_request_timeout']);
+        $this->client->setFileUploadRequestTimeout((int) $config['http_file_upload_timeout']);
+        $this->client->setVideoUploadRequestTimeout((int) $config['http_video_upload_timeout']);
+
         $this->pseudoRandomStringGenerator = PseudoRandomStringGeneratorFactory::createPseudoRandomStringGenerator(
             $config['pseudo_random_string_generator']
         );
