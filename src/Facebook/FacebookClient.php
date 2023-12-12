@@ -61,6 +61,11 @@ class FacebookClient
     const DEFAULT_REQUEST_TIMEOUT = 60;
 
     /**
+     * @const int The timeout in seconds for a post request.
+     */
+    const DEFAULT_POST_REQUEST_TIMEOUT = 60;
+
+    /**
      * @const int The timeout in seconds for a request that contains file uploads.
      */
     const DEFAULT_FILE_UPLOAD_REQUEST_TIMEOUT = 3600;
@@ -87,6 +92,8 @@ class FacebookClient
 
     protected int $default_request_timeout;
 
+    protected int $default_post_request_timeout;
+
     protected int $file_upload_request_timeout;
 
     protected int $video_upload_request_timeout;
@@ -97,13 +104,14 @@ class FacebookClient
      * @param FacebookHttpClientInterface|null $httpClientHandler
      * @param boolean                          $enableBeta
      */
-    public function __construct(FacebookHttpClientInterface $httpClientHandler = null, $enableBeta = false)
+    public function __construct(FacebookHttpClientInterface $httpClientHandler = null, bool $enableBeta = false, array $configs = [])
     {
         $this->httpClientHandler = $httpClientHandler ?: $this->detectHttpClientHandler();
         $this->enableBetaMode = $enableBeta;
-        $this->default_request_timeout = self::DEFAULT_REQUEST_TIMEOUT;
-        $this->file_upload_request_timeout = self::DEFAULT_FILE_UPLOAD_REQUEST_TIMEOUT;
-        $this->video_upload_request_timeout = self::DEFAULT_VIDEO_UPLOAD_REQUEST_TIMEOUT;
+        $this->default_request_timeout = $configs['default_request_timeout'] ?? self::DEFAULT_REQUEST_TIMEOUT;
+        $this->default_post_request_timeout = $configs['default_post_request_timeout'] ?? self::DEFAULT_POST_REQUEST_TIMEOUT;
+        $this->file_upload_request_timeout = $configs['file_upload_request_timeout'] ?? self::DEFAULT_FILE_UPLOAD_REQUEST_TIMEOUT;
+        $this->video_upload_request_timeout = $configs['video_upload_request_timeout'] ?? self::DEFAULT_VIDEO_UPLOAD_REQUEST_TIMEOUT;
     }
 
     /**
@@ -195,21 +203,6 @@ class FacebookClient
         ];
     }
 
-    public function setDefaultRequestTimeout(int $timeout): void
-    {
-        $this->default_request_timeout = $timeout;
-    }
-
-    public function setFileUploadRequestTimeout(int $timeout): void
-    {
-        $this->file_upload_request_timeout = $timeout;
-    }
-
-    public function setVideoUploadRequestTimeout(int $timeout): void
-    {
-        $this->video_upload_request_timeout = $timeout;
-    }
-
     /**
      * Makes the request to Graph and returns the result.
      *
@@ -233,6 +226,8 @@ class FacebookClient
             $timeOut = $this->file_upload_request_timeout;
         } elseif ($request->containsVideoUploads()) {
             $timeOut = $this->video_upload_request_timeout;
+        } elseif (strtoupper($method) == 'POST') {
+            $timeOut = $this->default_post_request_timeout;
         }
 
         // Should throw `FacebookSDKException` exception on HTTP client error.
